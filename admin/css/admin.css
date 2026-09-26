@@ -1,0 +1,95 @@
+/* Lemon Catalog Sync — admin styles (native WP admin look, no framework). */
+
+.lcs-wrap .lcs-cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+	gap: 12px;
+	margin: 20px 0;
+}
+
+.lcs-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #2271b1;
+	border-radius: 2px;
+	padding: 14px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.lcs-card--ok { border-left-color: #00a32a; }
+.lcs-card--warn { border-left-color: #dba617; }
+
+.lcs-card__label {
+	color: #646970;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+}
+
+.lcs-card__value {
+	font-size: 18px;
+	font-weight: 600;
+	color: #1d2327;
+	word-break: break-word;
+}
+
+.lcs-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.lcs-inline-form { display: inline; margin: 0; }
+
+.lcs-panel {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	padding: 16px 20px;
+	margin: 20px 0;
+	max-width: 960px;
+}
+
+.lcs-status-table { max-width: 960px; margin-top: 16px; }
+.lcs-status-table th { width: 240px; font-weight: 600; }
+
+.lcs-badge {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 10px;
+	font-size: 12px;
+	line-height: 1.8;
+	background: #f0f0f1;
+	color: #1d2327;
+}
+
+.lcs-badge--ok { background: #d1f0d8; color: #0a4b1c; }
+.lcs-badge--missing { background: #fcdcdc; color: #8a1f1f; }
+.lcs-badge--test { background: #fcf0c3; color: #614a00; }
+
+.lcs-text-warn { color: #b32d2e; }
+
+.lcs-slug-input { width: 16em; margin: 0 2px; }
+
+.lcs-steps li { margin-bottom: 6px; }
+.lcs-emphasis { margin: 16px 0; }
+
+.lcs-errors { list-style: disc; padding-left: 20px; }
+
+/* Product edit metabox */
+.lcs-managed {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-weight: 600;
+	color: #2271b1;
+	margin-top: 0;
+}
+
+.lcs-data-table th { width: 180px; }
+.lcs-data-table td { word-break: break-all; }
+.lcs-data-table__thumb { max-width: 120px; height: auto; border-radius: 4px; }
+
+.lcs-variant-admin-list { margin: 0 0 12px; }

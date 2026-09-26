@@ -1,0 +1,17 @@
+# Bağımlılıklar
+/vendor/
+/node_modules/
+
+# IDE / işletim sistemi
+.DS_Store
+.idea/
+.vscode/
+
+# Dağıtım çıktıları
+/dist/
+/*.zip
+
+# Yerel ortam dosyaları
+.env
+.env.local
+/build/

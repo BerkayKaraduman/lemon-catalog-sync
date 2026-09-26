@@ -1,0 +1,170 @@
+/* Lemon Catalog Sync — frontend components. Themes and Elementor controls override these. */
+
+.lcs-product-image { line-height: 0; }
+
+.lcs-product-image__img {
+	display: inline-block;
+	max-width: 100%;
+	height: auto;
+}
+
+.lcs-product-price {
+	font-size: 1.5em;
+	font-weight: 700;
+	margin: .25em 0 .75em;
+}
+
+.lcs-product-price__prefix,
+.lcs-product-price__suffix {
+	font-size: .7em;
+	font-weight: 400;
+	opacity: .8;
+}
+
+.lcs-product-price__pwyw {
+	display: inline-block;
+	font-size: .55em;
+	font-weight: 600;
+	padding: .2em .6em;
+	border-radius: 999px;
+	background: rgba(0, 0, 0, .06);
+	vertical-align: middle;
+}
+
+.lcs-lemon-description { margin: 0 0 1.25em; }
+.lcs-lemon-description > :last-child { margin-bottom: 0; }
+
+.lcs-buy-button-wrap { margin: 1em 0; }
+
+.lcs-buy-button {
+	display: inline-block;
+	box-sizing: border-box;
+	padding: .8em 1.8em;
+	border-radius: 6px;
+	background: #7047eb;
+	color: #fff;
+	font-weight: 600;
+	line-height: 1.2;
+	text-align: center;
+	text-decoration: none;
+	transition: background-color .15s ease, transform .15s ease;
+}
+
+.lcs-buy-button:hover,
+.lcs-buy-button:focus {
+	background: #5a33d6;
+	color: #fff;
+	text-decoration: none;
+}
+
+.lcs-buy-button:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 3px;
+}
+
+.lcs-buy-button--sm { padding: .55em 1.2em; font-size: .875em; }
+.lcs-buy-button--lg { padding: 1em 2.4em; font-size: 1.15em; }
+.lcs-buy-button--full { display: block; width: 100%; }
+
+.lcs-variants {
+	list-style: none;
+	margin: 0 0 1em;
+	padding: 0;
+	display: grid;
+	gap: .6em;
+}
+
+.lcs-variants--grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+
+.lcs-variant {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: .25em 1em;
+	padding: .75em 1em;
+	border: 1px solid rgba(0, 0, 0, .12);
+	border-radius: 6px;
+}
+
+.lcs-variant__name { font-weight: 600; }
+.lcs-variant__price { white-space: nowrap; }
+.lcs-variant__description { flex-basis: 100%; font-size: .9em; opacity: .85; }
+.lcs-variant__description > :last-child { margin-bottom: 0; }
+
+.lcs-product-meta { margin: 0 0 1em; }
+
+.lcs-product-meta__row {
+	display: flex;
+	justify-content: space-between;
+	gap: 1em;
+	padding: .35em 0;
+	border-bottom: 1px solid rgba(0, 0, 0, .08);
+}
+
+.lcs-product-meta dt { font-weight: 600; margin: 0; }
+.lcs-product-meta dd { margin: 0; text-align: right; }
+
+/* Automatic product block */
+.lcs-product-summary {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 2em;
+	margin: 0 0 2.5em;
+}
+
+@media (min-width: 768px) {
+	.lcs-product-summary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+}
+
+.lcs-product-summary__media .lcs-product-image__img { width: 100%; border-radius: 8px; }
+.lcs-product-summary__title { margin: 0 0 .25em; }
+
+/* Product grid */
+.lcs-products {
+	display: grid;
+	grid-template-columns: repeat(var(--lcs-columns, 3), minmax(0, 1fr));
+	gap: 1.5em;
+}
+
+@media (max-width: 900px) {
+	.lcs-products { grid-template-columns: repeat(min(var(--lcs-columns, 3), 2), minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+	.lcs-products { grid-template-columns: minmax(0, 1fr); }
+}
+
+.lcs-product-card {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid rgba(0, 0, 0, .1);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.lcs-product-card__media .lcs-product-image__img {
+	width: 100%;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+}
+
+.lcs-product-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: .25em;
+	padding: 1em;
+	flex: 1;
+}
+
+.lcs-product-card__title { margin: 0; font-size: 1.1em; }
+.lcs-product-card__title a { text-decoration: none; color: inherit; }
+.lcs-product-card .lcs-product-price { font-size: 1.1em; margin: 0; }
+.lcs-product-card__link { margin-top: auto; font-weight: 600; }
+
+.lcs-placeholder {
+	padding: 1em;
+	border: 1px dashed rgba(0, 0, 0, .3);
+	border-radius: 4px;
+	font-size: 13px;
+	opacity: .8;
+}
