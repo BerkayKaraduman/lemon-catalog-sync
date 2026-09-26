@@ -1,242 +1,159 @@
 # Lemon Catalog Sync for Elementor
 
-Lemon Squeezy ürün kataloğunu WordPress'e senkronize eden, Elementor ile tam uyumlu bir WordPress eklentisi. **WooCommerce gerektirmez.**
+[![Version](https://img.shields.io/badge/version-1.0.0-7047eb)](https://github.com/BerkayKaraduman/lemon-catalog-sync/releases/tag/v1.0.0)
+[![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759b)](https://wordpress.org)
+[![PHP](https://img.shields.io/badge/PHP-8.1%2B-777bb4)](https://www.php.net)
+[![License](https://img.shields.io/badge/license-GPL--2.0--or--later-green)](LICENSE)
+[![Instagram](https://img.shields.io/badge/Instagram-@yahyaberkay-e4405f)](https://www.instagram.com/yahyaberkay/)
 
-| Katman | Sorumluluk |
-| --- | --- |
-| **Lemon Squeezy** | Ürün verisinin tek kaynağı: ad, fiyat, açıklama, görsel, varyantlar, satın alma URL'si, durum |
-| **WordPress** | Ürün sayfaları, URL'ler, kategoriler, SEO |
-| **Elementor** | Ürün sayfası tasarımı ve her ürüne özel içerik |
-
-Her Lemon Squeezy ürünü WordPress'te ayrı bir **Dijital Ürün** (`lcs_product`) kaydı ve ayrı bir URL olur:
-
-```
-Lemon Squeezy: "Lightroom Preset Pack"  →  https://site.com/urun/lightroom-preset-pack/
-```
-
-Senkronizasyon yalnızca Lemon'a ait alanları günceller. Elementor tasarımınız, `post_content`, URL slug'ı, kategoriler, Yoast / Rank Math verileri ve özel alanlarınız **hiçbir senkronizasyonda değiştirilmez.**
+**English** · [Türkçe](#türkçe)
 
 ---
 
-## Requirements / Gereksinimler
+## English
 
-- WordPress 6.0+ (WordPress 7.1 ile test edildi)
-- PHP 8.1+
-- Bir Lemon Squeezy hesabı ve API anahtarı
-- İsteğe bağlı: Elementor 3.5+ (Elementor 4.3 ile test edildi), Elementor Pro (Theme Builder için)
-- Composer, npm veya build adımı **gerekmez**; paylaşımlı hostingde çalışır.
+### What it does
 
-## Installation / Kurulum
+Sell digital products with **Lemon Squeezy** and show them on **WordPress** — without WooCommerce.
 
-1. `lemon-catalog-sync.zip` dosyasını **Eklentiler → Yeni Ekle → Eklenti Yükle** ile yükleyin (veya klasörü `wp-content/plugins/` içine kopyalayın).
-2. Eklentiyi etkinleştirin. Etkinleştirmede özel yazı türü ve taksonomi kaydedilir, rewrite kuralları bir kez yenilenir.
-3. Menüde **Lemon Catalog Sync** (Dashboard, Sync, Settings, Elementor Setup) ve **Dijital Ürünler** görünür.
+You add a product to Lemon Squeezy **once**. The plugin automatically creates a WordPress product page for it (e.g. `yoursite.com/urun/lightroom-preset-pack/`) and keeps the name, price, description, image, variants and buy link up to date. You design the page with **Elementor** (or use the built-in layout), and your design, URL, categories and SEO are **never overwritten** by a sync.
 
-Kaynak koddan zip üretmek için: `bash bin/build-zip.sh` → `build/lemon-catalog-sync.zip`.
+### Features
 
-## API Key Setup / API Anahtarı
+- 🔄 **Automatic Sync** — every 15 minutes, hourly, twice daily or daily (plus a manual "Sync Now" button)
+- 🧩 **Elementor** — 6 widgets (Image, Price, Description, Buy Button, Variants, Meta), Dynamic Tags, Theme Builder support
+- 🛡️ **Your content is safe** — sync only updates Lemon data; Elementor designs, URLs, categories and Yoast / Rank Math data are never touched
+- 💳 **Checkout** — Lemon hosted checkout or the Lemon.js overlay
+- 🧱 **Works without Elementor** — automatic product layout and shortcodes
+- 🚫 **No WooCommerce, no Composer, no build step** — works on shared hosting
 
-Lemon Squeezy → **Settings → API** bölümünden bir anahtar oluşturun.
+### Quick start
 
-**Önerilen yöntem — `wp-config.php`:**
+1. **Download** `lemon-catalog-sync.zip` from the [latest release](https://github.com/BerkayKaraduman/lemon-catalog-sync/releases/latest).
+2. In WordPress go to **Plugins → Add New → Upload Plugin**, upload the ZIP and click **Activate**.
+3. In Lemon Squeezy, turn on **Test mode** and create an API key under **Settings → API**.
+4. In WordPress go to **Lemon Catalog Sync → Settings**, paste the key and click **Save**, then **Test Connection**.
+5. Select your **Store** and save.
+6. Go to **Lemon Catalog Sync → Sync** and click **SYNC NOW**. Your products appear under **Dijital Ürünler**.
+7. Set **Automatic Sync Frequency** in Settings (e.g. *Hourly*) so new products and price changes appear automatically.
+8. Design your product page:
+   - **Elementor Pro:** Theme Builder → Single → condition *Dijital Ürünler → All*. Add *LCS Product Image*, *Post Title*, *LCS Product Price*, *LCS Buy Button* and the **Post Content** widget.
+   - **No Elementor Pro:** set **Frontend Display Mode** to *Automatic Product Block*.
+9. **Going live:** when your store is out of test mode, create a **live mode API key** in Lemon Squeezy and replace the test key in Settings (or in `wp-config.php`), then run **SYNC NOW** again.
+
+> ⚠️ **API key:** test first with a **test mode** key. After your store goes live, **replace it with a live mode key** — test keys only return test products.
+
+Optional, more secure: put the key in `wp-config.php` instead of the database:
 
 ```php
-define( 'LCS_LEMON_API_KEY', 'eyJ0eXAiOiJKV1Qi...' );
+define( 'LCS_LEMON_API_KEY', 'your-api-key' );
 ```
 
-Bu sabit tanımlıysa veritabanındaki anahtar yok sayılır.
-
-**Alternatif — Settings sayfası:** Anahtarı **Lemon Catalog Sync → Settings → API Key** alanına yapıştırın. Kaydetmeden önce anahtar Lemon API'ye karşı doğrulanır. Kaydedilen anahtar:
-
-- `autoload` edilmeyen ayrı bir seçenekte (`lcs_api_key`) saklanır,
-- sunucuda libsodium varsa sitenizin salt değerlerinden türetilen bir anahtarla şifrelenir,
-- HTML'de asla tam haliyle gösterilmez (yalnızca `••••••••abcd`); input alanı her zaman boş gelir, boş bırakıp kaydetmek mevcut anahtarı korur.
-
-## Store Connection / Mağaza Bağlantısı
-
-1. **Test Connection** butonu `GET /v1/users/me` ile anahtarı doğrular ve `GET /v1/stores` ile erişilebilen mağazaları yükler.
-2. Tek mağaza varsa otomatik seçilir; birden fazlaysa **Store** açılır listesinden seçin.
-3. Tüm ürün istekleri `filter[store_id]` ile yalnızca bu mağazaya filtrelenir.
-
-## First Sync / İlk Senkronizasyon
-
-**Lemon Catalog Sync → Sync → SYNC NOW**
-
-Senkronizasyon şu isteği tüm sayfalar bitene kadar tekrarlar:
+### Shortcodes
 
 ```
-GET https://api.lemonsqueezy.com/v1/products
-    ?filter[store_id]=STORE_ID&include=variants&page[size]=100&page[number]=N
+[lcs_products columns="3" limit="12"]            product grid
+[lcs_products category="preset" columns="4"]     grid by category
+[lcs_product_price]  [lcs_product_image]  [lcs_lemon_description]
+[lcs_product_buy_button]  [lcs_product_variants]  [lcs_product_meta]
 ```
 
-- **Yeni ürün:** `lcs_product` oluşturulur. Başlık = Lemon adı, slug = Lemon slug'ı, Lemon `published` → `publish`, `draft` → `draft`. `post_content` boş bırakılır; Lemon açıklaması `_lcs_lemon_description` meta alanına yazılır.
-- **Mevcut ürün:** Lemon Product ID ile eşleşen **aynı** kayıt güncellenir (duplicate oluşmaz). Yalnızca `post_title`, yayın durumu ve `_lcs_*` meta alanları değişir.
-- **Değişmemiş ürün:** Lemon `updated_at` ve içerik parmak izi aynıysa meta yazımı atlanır.
-- **Lemon'dan kaldırılmış ürün:** Tüm sayfalar hatasız çekildiyse ürün **silinmez**; `draft` yapılır ve `_lcs_missing_from_lemon = 1` işaretlenir. Ürün geri gelirse yeniden yayınlanır ve işaret kaldırılır.
+### Security
 
-Sync sayfası; bağlantı durumu, seçili mağaza, ortam (Test/Live), son deneme, son başarılı senkronizasyon, Created / Updated / Drafted / Unchanged / Failed sayıları, kilit durumu ve son hatayı gösterir.
+**No known security issues.** The plugin was reviewed and tested for:
 
-### Veri sahipliği
+- **API key never exposed** — not in page HTML, JavaScript, REST API, error messages or logs; shown masked (`••••••••abcd`); stored encrypted and not autoloaded; `wp-config.php` constant supported
+- **Admin protection** — every action requires the `manage_options` capability and a valid nonce
+- **Safe input/output** — all input sanitized, all output escaped, Lemon HTML filtered with `wp_kses_post`
+- **No data loss** — failed API calls change nothing; products removed from Lemon are set to draft, never deleted; uninstall keeps your products and content
+- **Official APIs only** — WordPress HTTP API and the official Lemon Squeezy API / Lemon.js CDN
 
-| Lemon Squeezy yönetir (sync yazar) | WordPress yönetir (sync asla dokunmaz) |
-| --- | --- |
-| `_lcs_product_id`, `_lcs_store_id`, `_lcs_lemon_description`, `_lcs_price`, `_lcs_price_formatted`, `_lcs_from_price(_formatted)`, `_lcs_to_price(_formatted)`, `_lcs_pay_what_you_want`, `_lcs_buy_now_url`, `_lcs_thumb_url`, `_lcs_large_thumb_url`, `_lcs_lemon_status(_formatted)`, `_lcs_lemon_created_at`, `_lcs_lemon_updated_at`, `_lcs_test_mode`, `_lcs_variants`, `_lcs_last_sync`, `_lcs_missing_from_lemon` | URL slug'ı (`post_name`), `post_content`, `post_excerpt`, `menu_order`, sayfa şablonu, kategoriler, `_elementor_*`, `_wpseo_*`, `rank_math_*`, kendi özel alanlarınız, sizin seçtiğiniz öne çıkan görsel |
-| `post_title`, yayın durumu (`publish` ↔ `draft`) | Çöp kutusu / özel / beklemede / zamanlanmış durumlar |
+Found a problem? Please open an [issue](https://github.com/BerkayKaraduman/lemon-catalog-sync/issues).
 
-Bu kural kodda da zorunludur: sync'in meta yazan tek fonksiyonu `_lcs_` önekli olmayan her anahtarı reddeder. Başlık ve durum, `post_content`'i yeniden kaydetmeyen (dolayısıyla kses/içerik filtrelerinden geçirmeyen) sütun bazlı bir güncelleme ile yazılır.
+### Requirements
 
-## Automatic Sync / Otomatik Senkronizasyon
+WordPress 6.0+ · PHP 8.1+ · Lemon Squeezy account · Elementor 3.5+ *(optional)* · Elementor Pro *(optional, for Theme Builder)*
 
-**Settings → Automatic Sync Frequency:** Disabled, Every 15 Minutes, Hourly, Twice Daily, Daily.
+Tested with WordPress 7.1 and Elementor 4.3.
 
-- WP-Cron ile çalışır; manuel ve otomatik senkronizasyon **aynı** servis sınıfını kullanır.
-- Her zaman tek bir zamanlanmış olay vardır (`wp_next_scheduled` kontrolü).
-- Manuel ve cron aynı anda çalışamaz: `lcs_sync_lock` kilidi 15 dakikada kendiliğinden düşer, bu yüzden bir hata sonrası kalıcı kilit oluşmaz.
-- Lemon API `429` döndürürse `Retry-After` süresi kaydedilir ve cron bu süre dolana kadar istek atmaz (istek uyutulmaz/bloklanmaz).
-- Az trafikli sitelerde gerçek bir sunucu cron'u ile `wp-cron.php`'yi çağırmanız önerilir.
+### Author
 
-## Product URLs / Ürün URL'leri
+**Yahya Berkay Karaduman** · Instagram: [@yahyaberkay](https://www.instagram.com/yahyaberkay/)
 
-| Ayar | Varsayılan | Örnek |
-| --- | --- | --- |
-| Product URL Base | `urun` | `site.com/urun/lightroom-preset-pack/`, arşiv: `site.com/urun/` |
-| Product Category URL Base | `urun-kategori` | `site.com/urun-kategori/preset/` |
+License: [GPL-2.0-or-later](LICENSE)
 
-- Taban değişince rewrite kuralları yalnızca **bir kez** yenilenir; `flush_rewrite_rules()` normal isteklerde çağrılmaz.
-- **Slug koruması:** Lemon slug'ı yalnızca ürün ilk oluşturulurken kullanılır. Lemon'da ad veya slug sonradan değişse de WordPress URL'si aynı kalır. Slug'ı WordPress panelinden istediğiniz gibi değiştirebilirsiniz; sync buna dokunmaz.
-- Kategoriler (**Dijital Ürünler → Ürün Kategorileri**) tamamen size aittir: Preset, Template, Video, LUT, E-Book, Motion Graphics… Sync kategori atamalarını asla değiştirmez.
+---
 
-## Elementor Setup
+## Türkçe
 
-Elementor aktifse eklenti otomatik olarak:
+### Ne işe yarar?
 
-- `lcs_product` için **Edit with Elementor** desteğini açar (Elementor'ün *Post Types* ayarına mevcut değerleri koruyarak ekler),
-- **Lemon Catalog** widget kategorisini ve şu widget'ları kaydeder: **LCS Product Image**, **LCS Product Price**, **LCS Lemon Description**, **LCS Buy Button**, **LCS Variant Selector**, **LCS Product Meta**,
-- Dynamic Tag'leri kaydeder (Lemon Catalog grubu): Lemon Product ID, Lemon Price, Lemon Formatted Price, Lemon Description, Lemon Buy URL, Lemon Image URL, Lemon Image, Lemon Product Status.
+**Lemon Squeezy** ile dijital ürün satın ve bu ürünleri **WordPress** sitenizde gösterin. WooCommerce gerekmez.
 
-Widget'lar ürün ID'si istemez; bulundukları sayfadaki mevcut ürünü kullanır. Elementor editöründe tasarlanan şablonlarda gerçek veri görmeniz için en son ürün önizleme olarak kullanılır.
+Ürünü Lemon Squeezy'ye **bir kere** eklersiniz. Eklenti otomatik olarak WordPress'te ürün sayfasını oluşturur (örn. `siteniz.com/urun/lightroom-preset-pack/`). Ad, fiyat, açıklama, görsel, varyantlar ve satın alma linki sürekli güncel kalır. Sayfayı **Elementor** ile tasarlarsınız (veya hazır düzeni kullanırsınız). Tasarımınız, URL'niz, kategorileriniz ve SEO ayarlarınız senkronizasyonda **asla bozulmaz**.
 
-Elementor yoksa eklenti hatasız çalışır (shortcode'lar ve otomatik ürün bloğu ile). Durum için: **Lemon Catalog Sync → Elementor Setup**.
+### Özellikler
 
-## Theme Builder Setup (Elementor Pro)
+- 🔄 **Otomatik Senkronizasyon** — 15 dakikada bir, saatlik, günde iki kez veya günlük (ayrıca manuel "Sync Now" butonu)
+- 🧩 **Elementor** — 6 widget (Görsel, Fiyat, Açıklama, Satın Al Butonu, Varyantlar, Bilgiler), Dynamic Tag'ler, Theme Builder desteği
+- 🛡️ **İçeriğiniz güvende** — sync sadece Lemon verisini günceller; Elementor tasarımı, URL, kategori ve Yoast / Rank Math verilerine dokunmaz
+- 💳 **Ödeme** — Lemon hosted checkout veya Lemon.js overlay
+- 🧱 **Elementor olmadan da çalışır** — otomatik ürün düzeni ve shortcode'lar
+- 🚫 **WooCommerce, Composer veya build adımı yok** — paylaşımlı hostingde çalışır
 
-1. Elementor → **Theme Builder**
-2. **Single** şablon oluşturun
-3. Display Condition → **Dijital Ürünler → All**
-4. **LCS Product Image** ekleyin
-5. **Post Title** ekleyin
-6. **LCS Product Price** ekleyin
-7. **LCS Buy Button** ekleyin
-8. **Post Content** widget'ını ekleyin ← **zorunlu**
+### Adım adım kurulum
 
-> **Post Content widget'ı olmadan ürüne özel içerik görünmez.** Her ürünün *Edit with Elementor* ile oluşturulan içeriği, global şablonda Post Content widget'ının bulunduğu yerde gösterilir.
+1. [Son sürümden](https://github.com/BerkayKaraduman/lemon-catalog-sync/releases/latest) `lemon-catalog-sync.zip` dosyasını **indirin**.
+2. WordPress'te **Eklentiler → Yeni Ekle → Eklenti Yükle**'ye gidin, ZIP'i yükleyin ve **Etkinleştir**'e tıklayın.
+3. Lemon Squeezy'de **Test mode**'u açın ve **Settings → API** bölümünden bir API anahtarı oluşturun.
+4. WordPress'te **Lemon Catalog Sync → Settings**'e gidin, anahtarı yapıştırıp **Kaydet**'e, sonra **Test Connection**'a tıklayın.
+5. **Store** (mağaza) seçip kaydedin.
+6. **Lemon Catalog Sync → Sync** sayfasında **SYNC NOW**'a tıklayın. Ürünleriniz **Dijital Ürünler** menüsünde görünür.
+7. Settings'te **Automatic Sync Frequency** seçin (örn. *Hourly*). Yeni ürünler ve fiyat değişiklikleri otomatik gelir.
+8. Ürün sayfasını tasarlayın:
+   - **Elementor Pro varsa:** Theme Builder → Single → koşul *Dijital Ürünler → All*. *LCS Product Image*, *Post Title*, *LCS Product Price*, *LCS Buy Button* ve **Post Content** widget'ını ekleyin.
+   - **Elementor Pro yoksa:** **Frontend Display Mode** ayarını *Automatic Product Block* yapın.
+9. **Yayına geçiş:** Mağazanız test modundan çıkınca Lemon Squeezy'de **live mode API anahtarı** oluşturun, Settings'teki (veya `wp-config.php`'deki) test anahtarını bununla değiştirin ve tekrar **SYNC NOW** yapın.
 
-Örnek global şablon:
+> ⚠️ **API anahtarı:** Önce **test mode** anahtarıyla deneyin. Mağazanız yayına alındıktan sonra anahtarı **live mode anahtarıyla güncelleyin** — test anahtarı yalnızca test ürünlerini getirir.
 
-```
-LCS Product Image | Post Title | LCS Product Price | LCS Variant Selector | LCS Buy Button | LCS Lemon Description
-──────────────────────────────────────────────
-POST CONTENT   ← ürüne özel Elementor içeriği
-──────────────────────────────────────────────
-Global FAQ | Related Products
+İsteğe bağlı, daha güvenli yöntem: anahtarı veritabanı yerine `wp-config.php` dosyasına yazın:
+
+```php
+define( 'LCS_LEMON_API_KEY', 'api-anahtariniz' );
 ```
 
-Arşiv için: Theme Builder → **Archive** → Display Condition → Dijital Ürünler Archive (ve/veya Ürün Kategorileri).
+**İpucu:** Her ürüne özel içerik (galeri, video, SSS…) eklemek için **Dijital Ürünler → ürün → Elementor ile Düzenle**. Bu içerik şablondaki **Post Content** alanında görünür ve sync tarafından asla değiştirilmez.
 
-Settings → **Frontend Display Mode = Elementor Theme Builder** seçin (Elementor Pro varken etkinleştirmede otomatik seçilir).
-
-## Per Product Elementor Editing / Ürüne Özel Elementor İçeriği
-
-**Dijital Ürünler → (ürün) → Edit with Elementor** ile her ürüne tamamen farklı içerik ekleyin:
-
-- *Lightroom Preset Pack:* Before/After Slider, Preset Gallery, Installation Tutorial, FAQ
-- *Premiere Transition Pack:* Demo Video, Transition Showcase, System Requirements
-- *Social Media Templates:* Template Gallery, Canva Demo, Instagram Examples
-
-Header, fiyat, görsel ve satın alma butonu global şablondan gelir; bu içerik Post Content alanında gösterilir. Lemon'da fiyat $24 → $29 olduğunda sonraki senkronizasyonda **yalnızca fiyat** değişir; tasarım, URL, kategori, SEO ve özel içerik aynı kalır.
-
-## Checkout Modes / Ödeme Modları
-
-| Mod | Davranış |
-| --- | --- |
-| **Hosted Checkout** | Buton doğrudan ürünün Lemon `buy_now_url` adresine gider. İsteğe bağlı yeni sekme. |
-| **Checkout Overlay** | Butona `lemonsqueezy-button` sınıfı eklenir ve resmi `https://app.lemonsqueezy.com/js/lemon.js` yüklenir. Lemon.js self-host edilmez ve yalnızca satın alma butonu içeren sayfalarda yüklenir. |
-
-Ödeme her zaman ürün seviyesindeki resmi `buy_now_url` ile yapılır. Varyant seçici bilgilendirme amaçlıdır; API'de belgelenmemiş varyant checkout URL'leri üretilmez.
-
-**Frontend Display Mode = Automatic Product Block** (Elementor Pro olmayan siteler için): Tekil ürün sayfasında içerikten önce görsel, başlık, fiyat, Lemon açıklaması, varyantlar ve satın alma butonu otomatik eklenir, ardından WordPress/Elementor içeriği gelir. Blok yalnızca ana sorgudaki tekil ürün içeriğinde, bir kez çalışır; admin, REST, feed ve Elementor editöründe devre dışıdır.
-
-## Shortcodes
-
-Tümü Elementor olmadan da çalışır ve mevcut ürünü otomatik kullanır (isteğe bağlı `id="POST_ID"`).
-
-| Shortcode | Seçenekler |
-| --- | --- |
-| `[lcs_product_price]` | `mode="auto\|single\|from\|range"`, `show_from="yes\|no"`, `prefix`, `suffix` |
-| `[lcs_product_image]` | `size="large"` |
-| `[lcs_lemon_description]` | — |
-| `[lcs_product_buy_button]` | `text="Satın Al"`, `size="sm\|md\|lg"`, `full_width`, `new_tab`, `class` |
-| `[lcs_product_variants]` | `layout="list\|grid"`, `show_price`, `show_description` |
-| `[lcs_product_meta]` | `items="lemon_id,price,variants,status,environment,updated"` |
-| `[lcs_products]` | `category`, `columns` (1–6), `limit` (1–100), `orderby="date\|title\|modified\|menu_order\|rand\|price"`, `order="ASC\|DESC"` |
+### Shortcode'lar
 
 ```
-[lcs_products columns="3" limit="12"]
-[lcs_products category="preset" columns="4"]
+[lcs_products columns="3" limit="12"]            ürün listesi
+[lcs_products category="preset" columns="4"]     kategoriye göre liste
+[lcs_product_price]  [lcs_product_image]  [lcs_lemon_description]
+[lcs_product_buy_button]  [lcs_product_variants]  [lcs_product_meta]
 ```
 
-## Troubleshooting / Sorun Giderme
+### Güvenlik
 
-| Belirti | Çözüm |
-| --- | --- |
-| Ürün sayfası 404 | **Ayarlar → Kalıcı Bağlantılar** sayfasını açıp kaydedin. URL tabanının bir sayfa slug'ıyla çakışmadığından emin olun. |
-| "401 Unauthorized" | Anahtar yanlış veya iptal edilmiş. Yeni anahtar oluşturun. |
-| "rate limit (429)" | Lemon'un belirttiği süre sonunda otomatik sync kendiliğinden devam eder. |
-| "Another sync is already running" | Önceki çalışma bitene kadar bekleyin; kilit en geç 15 dakikada düşer. |
-| Ürünler taslağa alındı | Sync sayfasındaki *Missing from Lemon* sayısına ve ürün listesindeki etikete bakın; ürün Lemon mağazasında yayında mı ve doğru mağaza mı seçili? |
-| Ürüne özel Elementor içeriği görünmüyor | Single şablonunda **Post Content** widget'ı olmalı. |
-| Widget'lar görünmüyor | Elementor 3.5+ gerekir; Elementor Setup sayfasını kontrol edin. |
-| Otomatik sync çalışmıyor | WP-Cron ziyaretle tetiklenir; `DISABLE_WP_CRON` açıksa sunucu cron'u kurun. |
-| Media Library modunda görsel yok | Görsel indirilemezse uzak Lemon görseli kullanılır; kendi seçtiğiniz öne çıkan görsel asla değiştirilmez. |
+**Bilinen herhangi bir güvenlik sorunu yoktur.** Eklenti şu konularda incelendi ve test edildi:
 
-Geliştirici kancaları: `lcs_loaded`, `lcs_before_sync`, `lcs_after_sync`, `lcs_product_created`, `lcs_product_updated`, `lcs_product_marked_missing`, `lcs_enable_missing_detection`, `lcs_current_product_id`, `lcs_render_auto_block`, `lcs_product_summary_html`, `lcs_products_query_args`, `lcs_format_money`.
+- **API anahtarı hiçbir yerde görünmez** — sayfa HTML'i, JavaScript, REST API, hata mesajları ve loglarda yer almaz; maskeli gösterilir (`••••••••abcd`); şifreli ve autoload edilmeden saklanır; `wp-config.php` sabiti desteklenir
+- **Yönetici koruması** — tüm işlemler `manage_options` yetkisi ve geçerli nonce ister
+- **Güvenli girdi/çıktı** — tüm girdiler temizlenir, tüm çıktılar escape edilir, Lemon HTML'i `wp_kses_post` ile filtrelenir
+- **Veri kaybı yok** — API hatasında hiçbir şey değişmez; Lemon'dan kaldırılan ürünler silinmez, taslağa alınır; eklenti kaldırılsa bile ürünler ve içerikler korunur
+- **Sadece resmi API'ler** — WordPress HTTP API ve resmi Lemon Squeezy API / Lemon.js CDN
 
-## Security / Güvenlik
+Bir sorun mu buldunuz? Lütfen bir [issue](https://github.com/BerkayKaraduman/lemon-catalog-sync/issues) açın.
 
-- API anahtarı frontend HTML'inde, JavaScript'te, REST yanıtlarında, hata mesajlarında ve loglarda yer almaz; API hata mesajları anahtara karşı temizlenir.
-- `wp-config.php` sabiti desteklenir; veritabanı seçeneği autoload edilmez ve mümkünse şifrelenir.
-- Tüm admin işlemleri `manage_options` yetkisi ve nonce ile korunur.
-- Girdiler `sanitize_text_field`, `sanitize_key`, `sanitize_title`, `absint`, `esc_url_raw` ile; çıktılar `esc_html`, `esc_attr`, `esc_url`, `wp_kses_post` ile işlenir. Lemon açıklaması `wp_kses_post` ile filtrelenir.
-- HTTP istekleri yalnızca WordPress HTTP API (`wp_remote_get`) ile yapılır.
-- Devre dışı bırakma yalnızca cron ve kilidi temizler. Kaldırma varsayılan olarak **tüm verileri korur**; *Delete plugin settings on uninstall* işaretliyse yalnızca eklenti ayarları silinir. Ürünler, kategoriler, Elementor içerikleri, SEO verileri ve medya asla silinmez.
+### Gereksinimler
 
-## Mimari
+WordPress 6.0+ · PHP 8.1+ · Lemon Squeezy hesabı · Elementor 3.5+ *(isteğe bağlı)* · Elementor Pro *(isteğe bağlı, Theme Builder için)*
 
-```
-lemon-catalog-sync/
-├── lemon-catalog-sync.php          Başlık, sabitler, autoloader, aktivasyon kancaları
-├── uninstall.php                   Varsayılan: veriyi koru
-├── includes/
-│   ├── class-plugin.php            Servis konteyneri, lcs_loaded
-│   ├── class-settings.php          Ayarlar + şifreli, autoload edilmeyen API anahtarı
-│   ├── class-api-client.php        JSON:API istemcisi, hata/429 yönetimi, anahtar gizleme
-│   ├── class-store-service.php     Stores API
-│   ├── class-post-type.php         lcs_product + lcs_product_category, akıllı rewrite flush
-│   ├── class-product-mapper.php    Lemon → WordPress eşleme (null güvenli)
-│   ├── class-product-repository.php Tek yazma noktası; yalnızca _lcs_* meta
-│   ├── class-product-sync.php      Sayfalama, upsert, eksik ürün tespiti
-│   ├── class-sync-lock.php / class-sync-state.php / class-cron.php
-│   ├── class-image-manager.php     Media Library içe aktarma (duplicate yok)
-│   ├── class-product.php           Okuma modeli (widget/shortcode/tag ortak)
-│   ├── class-renderer.php          Ortak HTML bileşenleri
-│   ├── class-shortcodes.php / class-frontend.php / class-compat.php / class-activator.php
-├── admin/        Menü, sayfalar, admin-post işleyicileri, metabox, views/css/js
-├── elementor/    Integration, widgets/, dynamic-tags/
-└── public/css/   Frontend stilleri
-```
+WordPress 7.1 ve Elementor 4.3 ile test edildi.
 
-Gelecekteki üyelik modülü (Lemon `order_created` → WordPress kullanıcısı → satın alınan ürünler) `lcs_loaded` kancasıyla `Plugin::instance()->api()`, `settings()` ve Lemon ID → ürün eşlemesini yeniden kullanabilir; bu sürüm yalnızca ürün kataloğu senkronizasyonu yapar.
+### Geliştirici
 
-## Lisans
+**Yahya Berkay Karaduman** · Instagram: [@yahyaberkay](https://www.instagram.com/yahyaberkay/)
 
-GPL-2.0-or-later
+Lisans: [GPL-2.0-or-later](LICENSE)

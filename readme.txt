@@ -28,6 +28,7 @@ Lemon Squeezy is the source of product data; WordPress owns URLs, categories and
 1. Upload the plugin ZIP via Plugins → Add New → Upload Plugin and activate it.
 2. Add your API key in Lemon Catalog Sync → Settings, or in wp-config.php: `define( 'LCS_LEMON_API_KEY', '...' );`
 3. Click "Test Connection" and select your store.
+   Start with a Lemon Squeezy test mode API key. When your store goes live, replace it with a live mode key and sync again.
 4. Run Lemon Catalog Sync → Sync → SYNC NOW.
 5. With Elementor Pro: create a Theme Builder Single template for "Dijital Ürünler" and include the Post Content widget. Without it: choose "Automatic Product Block" as Frontend Display Mode.
 
@@ -48,6 +49,10 @@ Where the Post Content widget sits in your Theme Builder Single template.
 == Shortcodes ==
 
 `[lcs_product_price]`, `[lcs_product_image]`, `[lcs_lemon_description]`, `[lcs_product_buy_button]`, `[lcs_product_variants]`, `[lcs_product_meta]`, `[lcs_products category="preset" columns="3" limit="12" orderby="date" order="DESC"]`
+
+== Author ==
+
+Yahya Berkay Karaduman — Instagram: @yahyaberkay (https://www.instagram.com/yahyaberkay/)
 
 == Changelog ==
 

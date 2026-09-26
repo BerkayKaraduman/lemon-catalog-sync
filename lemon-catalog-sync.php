@@ -7,6 +7,7 @@
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Author:            Yahya Berkay Karaduman
+ * Author URI:        https://www.instagram.com/yahyaberkay/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       lemon-catalog-sync
