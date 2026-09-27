@@ -1,17 +1,36 @@
-# Bağımlılıklar
+# --- Secrets & local configuration (never commit) ---
+wp-config.php
+wp-config-local.php
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+auth.json
+
+# --- Dependencies (dev tooling only; the plugin has no runtime dependencies) ---
 /vendor/
 /node_modules/
+composer.lock
 
-# IDE / işletim sistemi
+# --- Build output ---
+/build/
+/dist/
+*.zip
+
+# --- Logs, caches, temp ---
+*.log
+*.cache
+.phpcs-cache
+.phpunit.result.cache
+/tmp/
+*.tmp
+*.swp
+*~
+
+# --- OS / IDE ---
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/
-
-# Dağıtım çıktıları
-/dist/
-/*.zip
-
-# Yerel ortam dosyaları
-.env
-.env.local
-/build/
+*.sublime-*

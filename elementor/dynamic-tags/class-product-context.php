@@ -7,7 +7,6 @@
 
 namespace LCS\Elementor\Dynamic_Tags;
 
-use LCS\Compat;
 use LCS\Elementor\Integration;
 use LCS\Product;
 
@@ -29,10 +28,6 @@ trait Product_Context {
 	 * Current product.
 	 */
 	protected function product(): ?Product {
-		$product = Product::current();
-		if ( ! $product && Compat::is_elementor_editor() ) {
-			$product = Product::preview_fallback();
-		}
-		return $product;
+		return \LCS\Product_Context::get_current_product();
 	}
 }

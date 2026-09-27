@@ -12,8 +12,9 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Thin, read-only client. Every failure is returned as WP_Error; the API key
- * is stripped from every message before it leaves this class.
+ * Thin, read-only client. The API key comes only from Credentials and is only
+ * ever placed in the Authorization header of a server-side wp_remote_get().
+ * Every failure is returned as WP_Error with the key stripped from the message.
  */
 final class Api_Client {
 
@@ -41,15 +42,25 @@ final class Api_Client {
 	}
 
 	/**
-	 * GET a JSON:API endpoint.
+	 * GET a JSON:API endpoint with the configured key (Credentials::get_api_key()).
 	 *
 	 * @param string               $endpoint Path relative to /v1/, e.g. "products".
 	 * @param array<string,scalar> $query    Query parameters.
-	 * @param string|null          $api_key  Override key (used to test a key before saving it).
 	 * @return array<string,mixed>|WP_Error Decoded document.
 	 */
-	public function get( string $endpoint, array $query = array(), ?string $api_key = null ): array|WP_Error {
-		$key = $api_key ?? $this->settings->get_api_key();
+	public function get( string $endpoint, array $query = array() ): array|WP_Error {
+		return $this->request( $endpoint, $query, Credentials::get_api_key() );
+	}
+
+	/**
+	 * Performs the request. The only place the Authorization header is built.
+	 *
+	 * @param string               $endpoint Endpoint.
+	 * @param array<string,scalar> $query    Query parameters.
+	 * @param string               $key      API key.
+	 * @return array<string,mixed>|WP_Error
+	 */
+	private function request( string $endpoint, array $query, string $key ): array|WP_Error {
 		if ( '' === $key ) {
 			return new WP_Error( 'lcs_no_api_key', __( 'No Lemon Squeezy API key is configured.', 'lemon-catalog-sync' ) );
 		}
@@ -108,13 +119,32 @@ final class Api_Client {
 	}
 
 	/**
-	 * Verifies a key by calling GET /v1/users/me.
+	 * Verifies the configured key by calling GET /v1/users/me.
 	 *
-	 * @param string|null $api_key Key to test; defaults to the configured key.
 	 * @return array{name:string}|WP_Error
 	 */
-	public function test_connection( ?string $api_key = null ): array|WP_Error {
-		$doc = $this->get( 'users/me', array(), $api_key );
+	public function test_connection(): array|WP_Error {
+		return $this->account( $this->get( 'users/me' ) );
+	}
+
+	/**
+	 * Verifies a candidate key typed in the settings form before it is stored.
+	 * The candidate is used for this single request only and never persisted here.
+	 *
+	 * @param string $candidate Candidate key.
+	 * @return array{name:string}|WP_Error
+	 */
+	public function test_candidate_key( string $candidate ): array|WP_Error {
+		return $this->account( $this->request( 'users/me', array(), trim( $candidate ) ) );
+	}
+
+	/**
+	 * Extracts the account name from a users/me document.
+	 *
+	 * @param array<string,mixed>|WP_Error $doc Document.
+	 * @return array{name:string}|WP_Error
+	 */
+	private function account( array|WP_Error $doc ): array|WP_Error {
 		if ( is_wp_error( $doc ) ) {
 			return $doc;
 		}
@@ -207,12 +237,12 @@ final class Api_Client {
 	}
 
 	/**
-	 * Removes the API key from any string.
+	 * Removes the configured key and the key used for this request from a string.
 	 *
 	 * @param string $message Message.
-	 * @param string $key     Key.
+	 * @param string $key     Key used for the request.
 	 */
 	private function redact( string $message, string $key ): string {
-		return '' === $key ? $message : str_replace( $key, '[redacted]', $message );
+		return Credentials::redact( $message, $key );
 	}
 }

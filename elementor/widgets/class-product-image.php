@@ -209,6 +209,8 @@ class Product_Image extends Base_Widget {
 			)
 		);
 
+		$this->add_spacing_controls( '.lcs-product-image' );
+
 		$this->end_controls_section();
 	}
 

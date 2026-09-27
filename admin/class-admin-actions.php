@@ -7,6 +7,7 @@
 
 namespace LCS\Admin;
 
+use LCS\Credentials;
 use LCS\Cron;
 use LCS\Plugin;
 use LCS\Settings;
@@ -68,27 +69,36 @@ final class Admin_Actions {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$input = isset( $_POST['lcs'] ) && is_array( $_POST['lcs'] ) ? wp_unslash( $_POST['lcs'] ) : array();
 
-		// API key: an empty field keeps the stored key; the key is never echoed back.
-		if ( ! $settings->has_constant_key() ) {
-			$new_key = isset( $input['api_key'] ) ? sanitize_text_field( (string) $input['api_key'] ) : '';
+		// API key (database fallback only). With LCS_LEMON_API_KEY defined any
+		// posted key is ignored and nothing is written to wp_options.
+		if ( Credentials::has_constant_key() ) {
+			if ( ! empty( $input['remove_stored_api_key'] ) && Credentials::has_stored_key() ) {
+				Credentials::delete_stored_key();
+				$messages[] = __( 'The API key stored in the database was removed. The key from wp-config.php is used.', 'lemon-catalog-sync' );
+			}
+		} else {
+			$new_key = isset( $input['api_key'] ) ? trim( sanitize_text_field( (string) $input['api_key'] ) ) : '';
 
 			if ( ! empty( $input['remove_api_key'] ) ) {
-				$settings->set_api_key( '' );
+				Credentials::delete_stored_key();
 				$stores->clear_cache();
 				$state->reset_connection();
 				$messages[] = __( 'API key removed.', 'lemon-catalog-sync' );
 			} elseif ( '' !== $new_key ) {
-				$test = $this->plugin->api()->test_connection( $new_key );
+				$test = $this->plugin->api()->test_candidate_key( $new_key );
 				if ( is_wp_error( $test ) ) {
 					$type       = 'error';
-					$messages[] = __( 'The new API key was not saved:', 'lemon-catalog-sync' ) . ' ' . $test->get_error_message();
-				} else {
-					$settings->set_api_key( $new_key );
+					$messages[] = __( 'The new API key was not saved:', 'lemon-catalog-sync' ) . ' ' . Credentials::redact( $test->get_error_message(), $new_key );
+				} elseif ( Credentials::store_key( $new_key ) ) {
 					$stores->clear_cache();
 					$state->record_connection( true, $this->connected_message( $test['name'] ) );
 					$messages[] = __( 'API key saved and verified.', 'lemon-catalog-sync' );
+				} else {
+					$type       = 'error';
+					$messages[] = __( 'The API key could not be saved.', 'lemon-catalog-sync' );
 				}
 			}
+			unset( $new_key );
 		}
 
 		$values = array();

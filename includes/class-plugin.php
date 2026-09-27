@@ -117,16 +117,18 @@ final class Plugin {
 		( new Shortcodes( $this->renderer ) )->hooks();
 		( new Frontend( $this->settings, $this->renderer ) )->hooks();
 		( new Elementor\Integration() )->hooks();
+		( new Upgrade() )->hooks();
 
 		if ( is_admin() ) {
 			( new Admin\Admin( $this ) )->hooks();
 			( new Admin\Product_Metabox() )->hooks();
+			( new Admin\Card_Metabox() )->hooks();
 		}
 
 		add_filter( 'plugin_action_links_' . LCS_BASENAME, array( $this, 'action_links' ) );
 
 		/**
-		 * Fires when Lemon Catalog Sync is ready.
+		 * Fires when Lemon Catalog Sync for Elementor is ready.
 		 *
 		 * @param Plugin $plugin Plugin instance.
 		 */

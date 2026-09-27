@@ -53,11 +53,7 @@ abstract class Base_Widget extends Widget_Base {
 	 * Theme Builder templates show real data while designing.
 	 */
 	protected function product(): ?Product {
-		$product = Product::current();
-		if ( ! $product && Compat::is_elementor_editor() ) {
-			$product = Product::preview_fallback();
-		}
-		return $product;
+		return \LCS\Product_Context::get_current_product();
 	}
 
 	/**
@@ -131,6 +127,28 @@ abstract class Base_Widget extends Widget_Base {
 				'selectors' => array( '{{WRAPPER}} ' . $selector => $property . ': {{VALUE}};' ),
 			)
 		);
+	}
+
+	/**
+	 * Responsive margin + padding controls.
+	 *
+	 * @param string $selector CSS selector (without {{WRAPPER}}).
+	 */
+	protected function add_spacing_controls( string $selector ): void {
+		foreach ( array(
+			'margin'  => __( 'Margin', 'lemon-catalog-sync' ),
+			'padding' => __( 'Padding', 'lemon-catalog-sync' ),
+		) as $property => $label ) {
+			$this->add_responsive_control(
+				$property,
+				array(
+					'label'      => $label,
+					'type'       => \Elementor\Controls_Manager::DIMENSIONS,
+					'size_units' => array( 'px', 'em', '%' ),
+					'selectors'  => array( '{{WRAPPER}} ' . $selector => $property . ': {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+				)
+			);
+		}
 	}
 
 	/**

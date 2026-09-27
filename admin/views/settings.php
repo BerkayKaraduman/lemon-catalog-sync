@@ -11,6 +11,7 @@
  */
 
 use LCS\Admin\Admin;
+use LCS\Credentials;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -38,12 +39,16 @@ $lcs_select_field = static function ( string $field, array $options, string $cur
 			<tr>
 				<th scope="row"><label for="lcs-api_key"><?php esc_html_e( 'API Key', 'lemon-catalog-sync' ); ?></label></th>
 				<td>
-					<?php if ( $settings->has_constant_key() ) : ?>
-						<p><span class="lcs-badge lcs-badge--ok"><?php esc_html_e( 'Defined in wp-config.php', 'lemon-catalog-sync' ); ?></span> <code><?php echo esc_html( $settings->api_key_hint() ); ?></code></p>
-						<p class="description"><?php esc_html_e( 'LCS_LEMON_API_KEY is set, so the key stored in the database (if any) is ignored.', 'lemon-catalog-sync' ); ?></p>
+					<?php if ( Credentials::has_constant_key() ) : ?>
+						<p class="lcs-secure-key"><span class="dashicons dashicons-lock" aria-hidden="true"></span> <strong><?php esc_html_e( 'API key is configured securely via wp-config.php', 'lemon-catalog-sync' ); ?></strong></p>
+						<p class="description"><?php esc_html_e( 'The key is read from the LCS_LEMON_API_KEY constant. It is not shown here and is never stored in the database.', 'lemon-catalog-sync' ); ?></p>
+						<?php if ( Credentials::has_stored_key() ) : ?>
+							<p class="description lcs-text-warn"><?php esc_html_e( 'An older API key is still stored in the database. It is ignored while LCS_LEMON_API_KEY is defined; remove it for extra safety.', 'lemon-catalog-sync' ); ?></p>
+							<label><input type="checkbox" name="lcs[remove_stored_api_key]" value="1" /> <?php esc_html_e( 'Remove the API key stored in the database', 'lemon-catalog-sync' ); ?></label>
+						<?php endif; ?>
 					<?php else : ?>
 						<input type="password" class="regular-text" name="lcs[api_key]" id="lcs-api_key" value="" autocomplete="new-password" spellcheck="false"
-							placeholder="<?php echo esc_attr( $settings->has_api_key() ? $settings->api_key_hint() : __( 'Paste your Lemon Squeezy API key', 'lemon-catalog-sync' ) ); ?>" />
+							placeholder="<?php echo esc_attr( Credentials::has_api_key() ? Credentials::masked() : __( 'Paste your Lemon Squeezy API key', 'lemon-catalog-sync' ) ); ?>" />
 						<?php if ( $settings->has_api_key() ) : ?>
 							<p class="description"><?php esc_html_e( 'A key is saved. Leave empty to keep it; paste a new key to replace it.', 'lemon-catalog-sync' ); ?></p>
 							<label><input type="checkbox" name="lcs[remove_api_key]" value="1" /> <?php esc_html_e( 'Remove saved API key', 'lemon-catalog-sync' ); ?></label>

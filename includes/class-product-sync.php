@@ -156,7 +156,7 @@ final class Product_Sync {
 				sprintf(
 					/* translators: %s: error message. */
 					__( 'Sync aborted by an unexpected error: %s', 'lemon-catalog-sync' ),
-					str_replace( $this->settings->get_api_key(), '[redacted]', $e->getMessage() )
+					Credentials::redact( $e->getMessage() )
 				)
 			);
 			$this->state->record_failure( $error, $trigger );

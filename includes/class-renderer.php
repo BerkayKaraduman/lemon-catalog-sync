@@ -212,6 +212,142 @@ final class Renderer {
 	}
 
 	/**
+	 * Compare-at price formatted like the Lemon price of the same product
+	 * (same symbol and separators), e.g. 50 next to "$15.00" → "$50.00".
+	 *
+	 * @param Product $product Product.
+	 */
+	public function compare_price_text( Product $product ): string {
+		$cents = $product->compare_price_cents();
+		return null === $cents ? '' : $this->format_like_lemon( $product, $cents );
+	}
+
+	/**
+	 * Compare-at price block. Empty compare price → '' (nothing is printed).
+	 *
+	 * @param Product             $product Product.
+	 * @param array<string,mixed> $args    strike (bool), prefix, suffix, only_if_higher (bool).
+	 */
+	public function compare_price( Product $product, array $args = array() ): string {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'strike'         => true,
+				'prefix'         => '',
+				'suffix'         => '',
+				'only_if_higher' => false,
+			)
+		);
+
+		$text = $this->compare_price_text( $product );
+		if ( '' === $text ) {
+			return '';
+		}
+
+		// Numeric comparison in cents (never formatted strings).
+		if ( ! empty( $args['only_if_higher'] ) ) {
+			$price = $product->price();
+			if ( null !== $price && (int) $product->compare_price_cents() <= $price ) {
+				return '';
+			}
+		}
+
+		$this->enqueue_style();
+
+		$strike = ! empty( $args['strike'] );
+		$tag    = $strike ? 'del' : 'span';
+		$class  = 'lcs-compare-price' . ( $strike ? ' lcs-compare-price--strike' : '' );
+
+		$html = '<div class="' . esc_attr( $class ) . '">';
+		if ( '' !== (string) $args['prefix'] ) {
+			$html .= '<span class="lcs-compare-price__prefix">' . esc_html( (string) $args['prefix'] ) . '</span> ';
+		}
+		$html .= '<' . $tag . ' class="lcs-compare-price__amount">' . esc_html( $text ) . '</' . $tag . '>';
+		if ( '' !== (string) $args['suffix'] ) {
+			$html .= ' <span class="lcs-compare-price__suffix">' . esc_html( (string) $args['suffix'] ) . '</span>';
+		}
+		return $html . '</div>';
+	}
+
+	/**
+	 * Card subtitle.
+	 *
+	 * @param Product             $product Product.
+	 * @param array<string,mixed> $args    tag (p|div|span|h2-h6).
+	 */
+	public function card_subtitle( Product $product, array $args = array() ): string {
+		$text = $product->card_subtitle();
+		if ( '' === $text ) {
+			return '';
+		}
+
+		$this->enqueue_style();
+		$tag = $this->html_tag( (string) ( $args['tag'] ?? 'p' ), 'p' );
+		return '<' . $tag . ' class="lcs-card-subtitle">' . esc_html( $text ) . '</' . $tag . '>';
+	}
+
+	/**
+	 * Card badge.
+	 *
+	 * @param Product $product Product.
+	 */
+	public function card_badge( Product $product ): string {
+		$text = $product->card_badge();
+		if ( '' === $text ) {
+			return '';
+		}
+
+		$this->enqueue_style();
+		return '<div class="lcs-card-badge-wrap"><span class="lcs-card-badge">' . esc_html( $text ) . '</span></div>';
+	}
+
+	/**
+	 * Link to the product page (or the Lemon checkout).
+	 *
+	 * @param Product             $product Product.
+	 * @param array<string,mixed> $args    text, target (product|buy), new_tab (bool).
+	 */
+	public function product_link( Product $product, array $args = array() ): string {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'text'    => '',
+				'target'  => 'product',
+				'new_tab' => false,
+			)
+		);
+
+		$buy = 'buy' === $args['target'];
+		$url = $buy ? $product->buy_url() : $product->permalink();
+		if ( '' === $url ) {
+			return '';
+		}
+
+		$this->enqueue_style();
+
+		$classes = array( 'lcs-product-link' );
+		$attrs   = '';
+
+		if ( $buy && $this->settings->is_overlay_checkout() ) {
+			$classes[] = 'lemonsqueezy-button';
+			$url       = add_query_arg( 'embed', '1', $url );
+			$this->enqueue_lemonjs();
+		} elseif ( ! empty( $args['new_tab'] ) ) {
+			$attrs = ' target="_blank" rel="noopener"';
+		}
+
+		$text = '' !== trim( (string) $args['text'] ) ? (string) $args['text'] : __( 'İncele', 'lemon-catalog-sync' );
+
+		return sprintf(
+			'<div class="lcs-product-link-wrap"><a href="%1$s" class="%2$s"%3$s>%4$s</a></div>',
+			esc_url( $url ),
+			esc_attr( implode( ' ', $classes ) ),
+			$attrs,
+			esc_html( $text )
+		);
+	}
+
+	/**
 	 * Lemon description (HTML filtered with wp_kses_post).
 	 *
 	 * @param Product $product Product.
@@ -405,10 +541,14 @@ final class Renderer {
 	/**
 	 * Product grid.
 	 *
-	 * @param WP_Query $query   Query.
-	 * @param int      $columns Columns (1-6).
+	 * Card fields (badge, subtitle, compare price) are printed only when filled
+	 * in, so products without them render exactly as before.
+	 *
+	 * @param WP_Query $query       Query.
+	 * @param int      $columns     Columns (1-6).
+	 * @param bool     $card_fields Print the WordPress card fields.
 	 */
-	public function grid( WP_Query $query, int $columns ): string {
+	public function grid( WP_Query $query, int $columns, bool $card_fields = true ): string {
 		if ( ! $query->have_posts() ) {
 			return '<p class="lcs-products-empty">' . esc_html__( 'Henüz ürün yok.', 'lemon-catalog-sync' ) . '</p>';
 		}
@@ -425,6 +565,9 @@ final class Renderer {
 			}
 
 			$html .= '<article class="lcs-product-card">';
+			if ( $card_fields ) {
+				$html .= $this->card_badge( $product );
+			}
 			$html .= $this->image(
 				$product,
 				array(
@@ -435,6 +578,10 @@ final class Renderer {
 			);
 			$html .= '<div class="lcs-product-card__body">';
 			$html .= '<h3 class="lcs-product-card__title"><a href="' . esc_url( $product->permalink() ) . '">' . esc_html( $product->title() ) . '</a></h3>';
+			if ( $card_fields ) {
+				$html .= $this->card_subtitle( $product );
+				$html .= $this->compare_price( $product );
+			}
 			$html .= $this->price( $product );
 			$html .= '<a class="lcs-product-card__link" href="' . esc_url( $product->permalink() ) . '">' . esc_html__( 'İncele', 'lemon-catalog-sync' ) . '</a>';
 			$html .= '</div></article>';
@@ -517,6 +664,50 @@ final class Renderer {
 		 * @param string $currency Store currency.
 		 */
 		return (string) apply_filters( 'lcs_format_money', $label, $cents, $currency );
+	}
+
+	/**
+	 * Formats cents using the symbol and separators of the product's Lemon
+	 * formatted price; falls back to format_money() when there is none.
+	 *
+	 * @param Product $product Product.
+	 * @param int     $cents   Amount in cents.
+	 */
+	private function format_like_lemon( Product $product, int $cents ): string {
+		$sample = $product->price_formatted();
+		if ( '' === $sample ) {
+			$sample = $product->from_price_formatted();
+		}
+
+		if ( ! preg_match( '/^(\D*?)(\d(?:[\d.,\x{00A0}\x{202F} ]*\d)?)(\D*)$/u', $sample, $m ) ) {
+			return $this->format_money( $cents );
+		}
+
+		$decimal   = '';
+		$thousands = '';
+		if ( preg_match( '/([.,])\d{2}$/', $m[2], $d ) ) {
+			$decimal = $d[1];
+		}
+		if ( preg_match( '/\d([.,\x{00A0}\x{202F} ])\d{3}(?:\D|$)/u', $m[2], $t ) && $t[1] !== $decimal ) {
+			$thousands = $t[1];
+		} elseif ( '' !== $decimal ) {
+			$thousands = '.' === $decimal ? ',' : '.';
+		}
+
+		$decimals = '' !== $decimal ? 2 : 0;
+		$number   = number_format( $cents / 100, $decimals, '' !== $decimal ? $decimal : '.', $thousands );
+
+		return $m[1] . $number . $m[3];
+	}
+
+	/**
+	 * Whitelisted HTML tag name.
+	 *
+	 * @param string $tag      Requested tag.
+	 * @param string $fallback Fallback tag.
+	 */
+	private function html_tag( string $tag, string $fallback ): string {
+		return in_array( $tag, array( 'p', 'div', 'span', 'h2', 'h3', 'h4', 'h5', 'h6' ), true ) ? $tag : $fallback;
 	}
 
 	/**

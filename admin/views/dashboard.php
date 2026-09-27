@@ -35,7 +35,7 @@ $lcs_cards = array(
 );
 ?>
 <div class="wrap lcs-wrap">
-	<h1><?php esc_html_e( 'Lemon Catalog Sync', 'lemon-catalog-sync' ); ?></h1>
+	<h1><?php esc_html_e( 'Lemon Catalog Sync for Elementor', 'lemon-catalog-sync' ); ?></h1>
 	<?php Admin::notices(); ?>
 
 	<div class="lcs-cards">

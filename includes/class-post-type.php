@@ -102,6 +102,8 @@ final class Post_Type {
 			)
 		);
 
+		$this->register_card_meta();
+
 		register_taxonomy(
 			self::TAXONOMY,
 			self::POST_TYPE,
@@ -134,6 +136,57 @@ final class Post_Type {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Registers the WordPress-managed card fields for the REST API / block editor.
+	 *
+	 * The compare price is stored as a plain number string ("50", "39.9") and
+	 * exposed to REST as a number: both 50 and "50" are accepted. (WordPress
+	 * drops meta with multi-type schemas from REST, so a single type is used.)
+	 */
+	private function register_card_meta(): void {
+		$auth = static function ( $allowed, $meta_key, $post_id ): bool {
+			return current_user_can( 'edit_post', (int) $post_id );
+		};
+
+		register_post_meta(
+			self::POST_TYPE,
+			Meta::COMPARE_PRICE,
+			array(
+				'type'              => 'number',
+				'description'       => __( 'Compare-at (old / list) price as a plain number, without currency.', 'lemon-catalog-sync' ),
+				'single'            => true,
+				'sanitize_callback' => array( Meta::class, 'sanitize_compare_price' ),
+				'auth_callback'     => $auth,
+				'show_in_rest'      => array(
+					'schema' => array(
+						'type'    => 'number',
+						'minimum' => 0,
+						'context' => array( 'view', 'edit' ),
+					),
+				),
+			)
+		);
+
+		foreach ( array( Meta::CARD_SUBTITLE, Meta::CARD_BADGE ) as $key ) {
+			register_post_meta(
+				self::POST_TYPE,
+				$key,
+				array(
+					'type'              => 'string',
+					'single'            => true,
+					'sanitize_callback' => array( Meta::class, 'sanitize_card_value' ),
+					'auth_callback'     => $auth,
+					'show_in_rest'      => array(
+						'schema' => array(
+							'type'    => 'string',
+							'context' => array( 'view', 'edit' ),
+						),
+					),
+				)
+			);
+		}
 	}
 
 	/**

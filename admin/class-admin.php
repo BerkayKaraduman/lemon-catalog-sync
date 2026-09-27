@@ -52,7 +52,7 @@ final class Admin {
 	 */
 	public function menu(): void {
 		add_menu_page(
-			__( 'Lemon Catalog Sync', 'lemon-catalog-sync' ),
+			__( 'Lemon Catalog Sync for Elementor', 'lemon-catalog-sync' ),
 			__( 'Lemon Catalog Sync', 'lemon-catalog-sync' ),
 			self::CAPABILITY,
 			'lcs-dashboard',

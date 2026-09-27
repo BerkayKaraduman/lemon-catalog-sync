@@ -81,6 +81,24 @@ final class Product {
 	 * data while being designed in the Elementor editor.
 	 */
 	public static function preview_fallback(): ?self {
+		// Theme Builder / Loop Item templates: the representative preview product,
+		// resolved exactly like Elementor Pro's own dynamic tags (e.g. Post Title).
+		if ( Compat::is_elementor_editor() ) {
+			try {
+				$preview = Compat::in_dynamic_context( static fn() => self::current() );
+			} catch ( \Throwable $e ) {
+				$preview = null;
+			}
+			if ( $preview ) {
+				return $preview;
+			}
+
+			$preview = self::from_id( Compat::editor_preview_post_id() );
+			if ( $preview ) {
+				return $preview;
+			}
+		}
+
 		$ids = get_posts(
 			array(
 				'post_type'        => Post_Type::POST_TYPE,
@@ -316,6 +334,35 @@ final class Product {
 			return $public;
 		}
 		return $this->variants() ? 1 : 0;
+	}
+
+	/**
+	 * Compare-at / list price as stored in _lcs_compare_price ('' when empty).
+	 */
+	public function compare_price(): string {
+		return trim( $this->meta( Meta::COMPARE_PRICE ) );
+	}
+
+	/**
+	 * Compare-at price in cents, or null when empty / not a number.
+	 */
+	public function compare_price_cents(): ?int {
+		$amount = Meta::parse_price( $this->compare_price() );
+		return null === $amount ? null : (int) round( $amount * 100 );
+	}
+
+	/**
+	 * Card subtitle entered in WordPress.
+	 */
+	public function card_subtitle(): string {
+		return trim( $this->meta( Meta::CARD_SUBTITLE ) );
+	}
+
+	/**
+	 * Card badge entered in WordPress, e.g. "%40 İndirim".
+	 */
+	public function card_badge(): string {
+		return trim( $this->meta( Meta::CARD_BADGE ) );
 	}
 
 	/**

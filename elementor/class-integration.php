@@ -107,6 +107,10 @@ final class Integration {
 			Widgets\Buy_Button::class,
 			Widgets\Variant_Selector::class,
 			Widgets\Product_Meta::class,
+			Widgets\Compare_Price::class,
+			Widgets\Card_Subtitle::class,
+			Widgets\Card_Badge::class,
+			Widgets\Product_Link::class,
 		);
 
 		foreach ( $widgets as $widget ) {
@@ -140,6 +144,10 @@ final class Integration {
 				Dynamic_Tags\Image_Url::class,
 				Dynamic_Tags\Image::class,
 				Dynamic_Tags\Product_Status::class,
+				Dynamic_Tags\Compare_Price::class,
+				Dynamic_Tags\Card_Subtitle::class,
+				Dynamic_Tags\Card_Badge::class,
+				Dynamic_Tags\Product_Url::class,
 			);
 
 			foreach ( $tags as $tag ) {
@@ -148,7 +156,7 @@ final class Integration {
 		} catch ( \Throwable $e ) {
 			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- debug only, contains no secrets.
-				error_log( 'Lemon Catalog Sync: dynamic tags disabled — ' . $e->getMessage() );
+				error_log( 'Lemon Catalog Sync for Elementor: dynamic tags disabled — ' . $e->getMessage() );
 			}
 		}
 	}

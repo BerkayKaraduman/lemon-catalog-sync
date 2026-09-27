@@ -93,3 +93,23 @@
 .lcs-data-table__thumb { max-width: 120px; height: auto; border-radius: 4px; }
 
 .lcs-variant-admin-list { margin: 0 0 12px; }
+
+/* Kart Görünümü metabox */
+.lcs-card-fields__row { margin: 0 0 12px; }
+.lcs-card-fields__row label { display: block; font-weight: 600; margin-bottom: 4px; }
+.lcs-card-fields__row .description { display: block; margin-top: 4px; }
+.lcs-card-fields__lemon { margin-top: 0; color: #50575e; }
+.lcs-card-fields__lemon .dashicons { font-size: 16px; width: 16px; height: 16px; vertical-align: text-bottom; }
+.lcs-card-fields__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 12px 0 6px; }
+.lcs-card-fields__state { font-size: 12px; color: #50575e; }
+.lcs-card-fields__state.is-success { color: #008a20; font-weight: 600; }
+.lcs-card-fields__state.is-error { color: #b32d2e; font-weight: 600; }
+.lcs-card-fields__state.is-dirty { color: #996800; }
+.lcs-card-fields__message:empty { display: none; }
+.lcs-card-fields__message { margin: 0 0 10px; padding: 6px 10px; border-left: 4px solid #c3c4c7; background: #f6f7f7; }
+.lcs-card-fields__message.is-success { border-left-color: #00a32a; background: #edfaef; color: #0a4b1c; }
+.lcs-card-fields__message.is-error { border-left-color: #d63638; background: #fcf0f1; color: #8a1f1f; }
+.lcs-card-fields__autosave { margin: 0 0 10px; font-size: 12px; }
+.lcs-card-fields__info { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; margin: 0 0 10px; padding: 8px; background: #f6f7f7; font-size: 12px; }
+.lcs-card-fields__info dt { color: #646970; margin: 0; }
+.lcs-card-fields__info dd { margin: 0; word-break: break-word; }

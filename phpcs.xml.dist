@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Lemon Catalog Sync">
+<ruleset name="Lemon Catalog Sync for Elementor">
 	<description>Coding standard for Lemon Catalog Sync for Elementor.</description>
 
 	<file>.</file>

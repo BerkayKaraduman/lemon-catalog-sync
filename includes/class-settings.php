@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin settings and API key storage.
+ * Plugin settings.
  *
  * @package LCS
  */
@@ -10,15 +10,13 @@ namespace LCS;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Reads/writes the lcs_settings option and the (non-autoloaded) API key option.
+ * Reads/writes the lcs_settings option. The API key lives in Credentials.
  */
 final class Settings {
 
 	public const OPTION     = 'lcs_settings';
-	public const KEY_OPTION = 'lcs_api_key';
-	public const KEY_CONST  = 'LCS_LEMON_API_KEY';
-
-	private const CIPHER_PREFIX = 'lcs1:';
+	public const KEY_OPTION = Credentials::OPTION;
+	public const KEY_CONST  = Credentials::CONSTANT;
 
 	/**
 	 * Cached merged settings.
@@ -141,7 +139,8 @@ final class Settings {
 
 	/*
 	 * ---------------------------------------------------------------------
-	 * API key
+	 * API key — status only. The key itself is read exclusively through
+	 * Credentials::get_api_key() (see class-credentials.php).
 	 * ---------------------------------------------------------------------
 	 */
 
@@ -149,123 +148,27 @@ final class Settings {
 	 * Whether the key comes from wp-config.php.
 	 */
 	public function has_constant_key(): bool {
-		return defined( self::KEY_CONST ) && is_string( constant( self::KEY_CONST ) ) && '' !== trim( (string) constant( self::KEY_CONST ) );
-	}
-
-	/**
-	 * The effective API key. Never print this value.
-	 */
-	public function get_api_key(): string {
-		if ( $this->has_constant_key() ) {
-			return trim( (string) constant( self::KEY_CONST ) );
-		}
-
-		$stored = get_option( self::KEY_OPTION, '' );
-		return is_string( $stored ) ? $this->decrypt( $stored ) : '';
+		return Credentials::has_constant_key();
 	}
 
 	/**
 	 * Whether any key is configured.
 	 */
 	public function has_api_key(): bool {
-		return '' !== $this->get_api_key();
+		return Credentials::has_api_key();
 	}
 
 	/**
-	 * Whether a key is stored in the database but can no longer be decrypted
-	 * (e.g. the site's salts changed).
+	 * Whether a stored key can no longer be decrypted.
 	 */
 	public function stored_key_unreadable(): bool {
-		$stored = get_option( self::KEY_OPTION, '' );
-		return is_string( $stored ) && '' !== $stored && '' === $this->decrypt( $stored );
+		return Credentials::stored_key_unreadable();
 	}
 
 	/**
-	 * Stores the API key (encrypted when libsodium is available) without autoload.
-	 *
-	 * @param string $key Plain API key, or '' to remove it.
-	 */
-	public function set_api_key( string $key ): void {
-		$key = trim( $key );
-
-		if ( '' === $key ) {
-			delete_option( self::KEY_OPTION );
-			return;
-		}
-
-		// A new key must not inherit the old autoload value, so recreate the option.
-		delete_option( self::KEY_OPTION );
-		add_option( self::KEY_OPTION, $this->encrypt( $key ), '', false );
-	}
-
-	/**
-	 * Masked hint safe to print in HTML (never the full key).
+	 * Masked hint safe to print in HTML (never the key).
 	 */
 	public function api_key_hint(): string {
-		$key = $this->get_api_key();
-		if ( '' === $key ) {
-			return '';
-		}
-		return strlen( $key ) > 12 ? str_repeat( '•', 8 ) . substr( $key, -4 ) : str_repeat( '•', 8 );
-	}
-
-	/**
-	 * Encrypts a value with a key derived from the site's salts.
-	 *
-	 * @param string $plain Plain text.
-	 */
-	private function encrypt( string $plain ): string {
-		if ( ! function_exists( 'sodium_crypto_secretbox' ) ) {
-			return $plain;
-		}
-
-		try {
-			$nonce  = random_bytes( SODIUM_CRYPTO_SECRETBOX_NONCEBYTES );
-			$cipher = sodium_crypto_secretbox( $plain, $nonce, $this->crypto_key() );
-			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- binary-safe storage of ciphertext.
-			return self::CIPHER_PREFIX . base64_encode( $nonce . $cipher );
-		} catch ( \Throwable $e ) {
-			return $plain;
-		}
-	}
-
-	/**
-	 * Decrypts a stored value. Returns '' when it cannot be decrypted.
-	 *
-	 * @param string $stored Stored value.
-	 */
-	private function decrypt( string $stored ): string {
-		if ( ! str_starts_with( $stored, self::CIPHER_PREFIX ) ) {
-			return trim( $stored );
-		}
-
-		if ( ! function_exists( 'sodium_crypto_secretbox_open' ) ) {
-			return '';
-		}
-
-		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- see encrypt().
-		$raw = base64_decode( substr( $stored, strlen( self::CIPHER_PREFIX ) ), true );
-		if ( false === $raw || strlen( $raw ) <= SODIUM_CRYPTO_SECRETBOX_NONCEBYTES ) {
-			return '';
-		}
-
-		try {
-			$plain = sodium_crypto_secretbox_open(
-				substr( $raw, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES ),
-				substr( $raw, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES ),
-				$this->crypto_key()
-			);
-		} catch ( \Throwable $e ) {
-			return '';
-		}
-
-		return false === $plain ? '' : $plain;
-	}
-
-	/**
-	 * 32 byte key derived from wp_salt().
-	 */
-	private function crypto_key(): string {
-		return sodium_crypto_generichash( wp_salt( 'secure_auth' ) . '|lemon-catalog-sync', '', SODIUM_CRYPTO_SECRETBOX_KEYBYTES );
+		return Credentials::masked();
 	}
 }

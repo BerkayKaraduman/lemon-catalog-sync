@@ -60,4 +60,44 @@ final class Compat {
 
 		return isset( $elementor->preview ) && $elementor->preview->is_preview_mode();
 	}
+
+	/**
+	 * Runs $callback inside the same query context Elementor gives dynamic
+	 * tags. Elementor Pro's Theme Builder hooks these actions to switch to the
+	 * template's representative preview post (what "Post Title" shows), so LCS
+	 * widgets resolve that same product. Without Pro the actions are no-ops.
+	 *
+	 * @param callable $callback Callback.
+	 * @return mixed Callback result.
+	 */
+	public static function in_dynamic_context( callable $callback ) {
+		do_action( 'elementor/dynamic_tags/before_render' );
+		try {
+			return $callback();
+		} finally {
+			do_action( 'elementor/dynamic_tags/after_render' );
+		}
+	}
+
+	/**
+	 * Preview post chosen in the settings of the document being edited
+	 * (Theme Builder / Loop Item templates), or 0.
+	 */
+	public static function editor_preview_post_id(): int {
+		if ( ! self::is_elementor_editor() ) {
+			return 0;
+		}
+
+		try {
+			$documents = \Elementor\Plugin::$instance->documents ?? null;
+			$document  = $documents && method_exists( $documents, 'get_current' ) ? $documents->get_current() : null;
+			if ( ! $document || ! method_exists( $document, 'get_settings' ) ) {
+				return 0;
+			}
+			$preview_id = $document->get_settings( 'preview_id' );
+			return is_scalar( $preview_id ) ? absint( $preview_id ) : 0;
+		} catch ( \Throwable $e ) {
+			return 0;
+		}
+	}
 }

@@ -1,6 +1,6 @@
 {
-    "name": "berkaykaraduman/lemon-catalog-sync",
-    "description": "Lemon Squeezy product catalog sync for WordPress with Elementor integration. No WooCommerce.",
+    "name": "berkaykaraduman/lemon-catalog-sync-for-elementor",
+    "description": "Sync Lemon Squeezy products with WordPress and build fully customizable product experiences with Elementor — no WooCommerce required.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
@@ -23,6 +23,6 @@
     },
     "scripts": {
         "lint": "phpcs --standard=phpcs.xml.dist .",
-        "build": "bash bin/build-zip.sh"
+        "build": "bash bin/build-zip.sh lemon-catalog-sync-for-elementor-v3.0.0"
     }
 }

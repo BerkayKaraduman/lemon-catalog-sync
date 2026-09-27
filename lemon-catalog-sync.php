@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:       Lemon Catalog Sync for Elementor
- * Plugin URI:        https://github.com/BerkayKaraduman/lemon-catalog-sync
+ * Plugin URI:        https://github.com/BerkayKaraduman/lemon-catalog-sync-for-elementor
  * Description:       Syncs your Lemon Squeezy product catalog into a dedicated "Dijital Ürünler" post type with per-product Elementor design, Theme Builder support, widgets, dynamic tags and shortcodes. No WooCommerce required.
- * Version:           1.0.0
+ * Version:           3.0.0
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Author:            Yahya Berkay Karaduman
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LCS_VERSION', '1.0.0' );
+define( 'LCS_VERSION', '3.0.0' );
 define( 'LCS_FILE', __FILE__ );
 define( 'LCS_PATH', plugin_dir_path( __FILE__ ) );
 define( 'LCS_URL', plugin_dir_url( __FILE__ ) );

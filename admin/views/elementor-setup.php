@@ -100,11 +100,19 @@ $lcs_status = static function ( bool $ok, string $yes, string $no ): void {
 
 			<p><?php esc_html_e( 'Optional widgets from the "Lemon Catalog" category: LCS Lemon Description, LCS Variant Selector, LCS Product Meta. Dynamic Tags ("Lemon Catalog" group) are available in Elementor Pro for any widget field.', 'lemon-catalog-sync' ); ?></p>
 
+			<h2><?php esc_html_e( 'Product cards (Loop Grid / Loop Item)', 'lemon-catalog-sync' ); ?></h2>
+			<ol class="lcs-steps">
+				<li><?php esc_html_e( 'Fill in the "Kart Görünümü" box (compare price, subtitle, badge) on each product where you need it. Empty fields show nothing.', 'lemon-catalog-sync' ); ?></li>
+				<li><?php esc_html_e( 'Theme Builder → Loop Item, preview source: Dijital Ürünler.', 'lemon-catalog-sync' ); ?></li>
+				<li><?php esc_html_e( 'Add LCS Product Image, Post Title, LCS Card Badge, LCS Card Subtitle, LCS Compare Price, LCS Product Price and LCS Product Link.', 'lemon-catalog-sync' ); ?></li>
+				<li><?php esc_html_e( 'Add a Loop Grid widget, choose this template and set Query → Source → Dijital Ürünler. Each card shows its own product.', 'lemon-catalog-sync' ); ?></li>
+			</ol>
+
 			<h2><?php esc_html_e( 'Archive template', 'lemon-catalog-sync' ); ?></h2>
 			<p><?php esc_html_e( 'Theme Builder → Archive → Display Condition → Dijital Ürünler Archive (and Ürün Kategorileri). Without Elementor Pro use the shortcode [lcs_products columns="3" limit="12"].', 'lemon-catalog-sync' ); ?></p>
 
 			<h2><?php esc_html_e( 'What sync never changes', 'lemon-catalog-sync' ); ?></h2>
-			<p><?php esc_html_e( 'Elementor data (_elementor_*), post content, excerpt, URL slug, categories, featured image chosen by you, Yoast / Rank Math data. Only Lemon data (title, price, description, image URL, variants, buy URL, status) is refreshed.', 'lemon-catalog-sync' ); ?></p>
+			<p><?php esc_html_e( 'Elementor data (_elementor_*), post content, excerpt, URL slug, categories, featured image chosen by you, Yoast / Rank Math data and the "Kart Görünümü" fields. Only Lemon data (title, price, description, image URL, variants, buy URL, status) is refreshed.', 'lemon-catalog-sync' ); ?></p>
 		</div>
 	<?php endif; ?>
 </div>

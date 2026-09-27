@@ -165,6 +165,16 @@ class Product_Price extends Base_Widget {
 			)
 		);
 
+		$this->add_responsive_control(
+			'padding',
+			array(
+				'label'      => __( 'Padding', 'lemon-catalog-sync' ),
+				'type'       => Controls_Manager::DIMENSIONS,
+				'size_units' => array( 'px', 'em' ),
+				'selectors'  => array( '{{WRAPPER}} .lcs-product-price' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+			)
+		);
+
 		$this->end_controls_section();
 	}
 
